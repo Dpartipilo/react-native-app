@@ -34,22 +34,48 @@ export default class App extends Component {
     })
   }
 
+  onDelete(id){
+    let data = this.state.data.filter((item) => {
+      return item.id !== id;
+    })
+    this.setState({
+      data: data
+    })
+  }
+
+  onAdd(id){
+    let newItem = {
+      id: "test" + Math.random()*10,
+      title: 'New Item',
+      selected: false
+    }
+
+    this.state.data.push(newItem);
+    alert(this.state.data.length)
+
+    let data = this.state.data.map(item=>item);
+    this.setState({
+      data: data
+    })
+  }
+
   render() {
     return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <View style={styles.appContainer}>
         <View style={styles.container}>
           <Text>TO DO LIST</Text>
-          <Button style={styles.button} {...oButtonProps} title="Title replacer!"/>
-          <FlatList data={this.state.data} renderItem={({item}) => (          
+          <FlatList style={styles.flatList} data={this.state.data} renderItem={({item}) => (          
           <Item
             id={item.id}
             title={item.title}
             selected={item.selected}
             onSelect={this.onSelect.bind(this)}
+            onDelete={this.onDelete.bind(this)}
           />)}
           keyExtractor={item => item.id}
           />
+          <Button style={styles.button} onPress={() => this.onAdd()} title="ADD"/>
         </View>
       </View>
     </SafeAreaView>
@@ -57,23 +83,19 @@ export default class App extends Component {
   }
 }
 
-const Item = ({ id, title, selected, onSelect }) => {
+const Item = ({ id, title, selected, onSelect, onDelete }) => {
   return (
     <TouchableOpacity
       onPress={() => onSelect(id)}
       style={[
         styles.item,
-        { backgroundColor: selected ? '#6e3b6e' : '#f9c2ff' },
+        { backgroundColor: selected ? '#6e3b6e' : '#f9c2ff'},
       ]}
     >
       <Text style={styles.title}>{title}</Text>
+      <Button style={styles.deleteButton} color="red" onPress={() => onDelete(id)} title="Delete"/>
     </TouchableOpacity>
   );
-}
-
-let oButtonProps = {
-  title: 'Test',
-  onPress: () => Alert.alert('Button has been pressed')
 }
 
 const styles = StyleSheet.create({
@@ -98,10 +120,17 @@ const styles = StyleSheet.create({
   safeAreaContainer:{
     flex:1
   },
+  flatList:{
+    width: "100%",
+    height: "100%",
+  },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 5
+  },
+  deleteButton: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   item: {
     flex: 1,
